@@ -1,0 +1,1 @@
+export const STICKY_NOTE_COLORS = ['#FEF08A', '#BAE6FD', '#BBF7D0', '#FED7AA', '#E9D5FF'];
