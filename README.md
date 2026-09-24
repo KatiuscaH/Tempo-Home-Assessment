@@ -64,11 +64,11 @@ npm run preview
 ```text
 src/
 ├── api/
-│   └── notesApi.ts
+│   └── api.ts
 ├── components/
 │   └── StickyNote.tsx
 ├── consts/
-│   └── Colors.ts
+│   └── StickyNoteColors.ts
 ├── hook/
 │   └── useNotes.hook.ts
 ├── pages/
