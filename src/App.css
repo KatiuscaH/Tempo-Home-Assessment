@@ -58,6 +58,8 @@ body {
   width: 14px;
   height: 14px;
   cursor: nwse-resize;
+  /* Let pointer events drive resizing on touch/pen instead of scrolling */
+  touch-action: none;
   border-bottom-right-radius: 60px 20px;
 }
 
@@ -71,6 +73,11 @@ body {
 
 .note:focus {
   border: transparent;
+}
+
+.note-handle {
+  /* Let pointer events drive dragging on touch/pen instead of scrolling */
+  touch-action: none;
 }
 
 .note-handle:hover {

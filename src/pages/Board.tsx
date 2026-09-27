@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { StickyNote } from "../components/StickyNote"
 import { useNotes } from "../hooks/useNotes.hook";
+import { clampNoteRect, type Size } from "../utils/notes.utils";
+import { DEFAULT_NOTE_HEIGHT, DEFAULT_NOTE_WIDTH } from "../consts/NoteSize";
 
 export const Board = () => {
     const {
@@ -9,12 +11,14 @@ export const Board = () => {
         updateNote,
         bringToFront,
         deleteNote,
+        moveNoteInside,
         loading
     } = useNotes();
 
+    const boardRef = useRef<HTMLDivElement>(null);
+    const notesAreaRef = useRef<HTMLDivElement>(null);
     const deleteZoneRef = useRef<HTMLDivElement>(null);
 
-    // Persist on every change
     const handleBoardClick = (e: React.MouseEvent<HTMLDivElement>) => {
 
         // Only create a note when the board itself was clicked
@@ -22,41 +26,67 @@ export const Board = () => {
             return;
         }
 
-        const rect = e.currentTarget.getBoundingClientRect(); //
+        const board = e.currentTarget;
+        const rect = board.getBoundingClientRect();
 
-        const newNote = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        }
+        // Keep the new note fully inside the board when clicking near an edge
+        const position = clampNoteRect(
+            {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+                width: DEFAULT_NOTE_WIDTH,
+                height: DEFAULT_NOTE_HEIGHT,
+            },
+            { width: board.clientWidth, height: board.clientHeight }
+        );
 
-        addNote(newNote)
+        addNote(position)
     }
 
-    const handleDropOnDeleteZone = (e: MouseEvent, noteId: string) => {
-        if (!deleteZoneRef.current) return
+    // Notes may be dragged over the notes area and the delete zone, but not off the board.
+    // Measured from the notes-area origin, since note positions are relative to it.
+    const getDragBounds = (): Size | null => {
+        if (!boardRef.current || !notesAreaRef.current) return null;
 
-        const rect = deleteZoneRef.current?.getBoundingClientRect();
+        const boardRect = boardRef.current.getBoundingClientRect();
+        const notesAreaRect = notesAreaRef.current.getBoundingClientRect();
+
+        return {
+            width: boardRect.right - notesAreaRect.left,
+            height: notesAreaRef.current.clientHeight,
+        };
+    };
+
+    const handleDragEnd = (noteId: string, pointer: { x: number; y: number }) => {
+        if (!deleteZoneRef.current || !notesAreaRef.current) return
+
+        const rect = deleteZoneRef.current.getBoundingClientRect();
 
         if (
-            rect &&
-            e.clientX >= rect.left &&
-            e.clientX <= rect.right &&
-            e.clientY >= rect.top &&
-            e.clientY <= rect.bottom
+            pointer.x >= rect.left &&
+            pointer.x <= rect.right &&
+            pointer.y >= rect.top &&
+            pointer.y <= rect.bottom
         ) {
-            // delete note
             deleteNote(noteId)
+            return;
         }
+
+        // Not dropped on the trash: pull the note back fully inside the notes area
+        moveNoteInside(noteId, {
+            width: notesAreaRef.current.clientWidth,
+            height: notesAreaRef.current.clientHeight,
+        });
     }
 
     if (loading) return <div className="board">Loading...</div>;
 
     return (
-        <div className="board">
-            <div className="notes-area" onClick={handleBoardClick}>
+        <div ref={boardRef} className="board">
+            <div ref={notesAreaRef} className="notes-area" onClick={handleBoardClick}>
                 {!notes.length && <p className="empty-hint">Click to add a note</p>}
                 {notes.map(note => (
-                    <StickyNote key={note.id} note={note} onUpdate={updateNote} onBringToFront={() => bringToFront(note.id)} onDragEnd={handleDropOnDeleteZone} />
+                    <StickyNote key={note.id} note={note} onUpdate={updateNote} onBringToFront={() => bringToFront(note.id)} onDragEnd={handleDragEnd} getDragBounds={getDragBounds} />
                 ))}
             </div>
             <div ref={deleteZoneRef} className="delete-zone">🗑️<span>Drop here to delete</span></div>

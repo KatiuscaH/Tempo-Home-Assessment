@@ -13,5 +13,6 @@ export type StickyNoteProps = {
     note: Note;
     onUpdate: (id: string, changes: Partial<Note>) => void;
     onBringToFront: () => void;
-    onDragEnd: (e: MouseEvent, noteId: string) => void;
+    onDragEnd: (noteId: string, pointer: { x: number; y: number }) => void;
+    getDragBounds: () => { width: number; height: number } | null;
 }
