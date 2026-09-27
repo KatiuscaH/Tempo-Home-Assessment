@@ -20,6 +20,15 @@ export const clampNoteSize = (rect: Rect, bounds: Size): Size => ({
     height: clamp(rect.height, MIN_NOTE_HEIGHT, bounds.height - rect.y),
 });
 
+export type Bounds = { left: number; top: number; right: number; bottom: number };
+
+// Edges count as inside, so a drop exactly on the trash border still deletes
+export const isPointInRect = (point: Point, rect: Bounds): boolean =>
+    point.x >= rect.left &&
+    point.x <= rect.right &&
+    point.y >= rect.top &&
+    point.y <= rect.bottom;
+
 // Reassigns z-indexes to 1..n, preserving the current stacking order
 export const normalizeZIndexes = (notes: Note[]): Note[] => {
     const order = [...notes]

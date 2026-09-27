@@ -11,7 +11,7 @@ type Interaction =
 export const StickyNote = ({ note, onUpdate, onBringToFront, onDragEnd, getDragBounds }: StickyNoteProps) => {
 
     const [isDragging, setIsDragging] = useState(false);
-    const noteRef = useRef<HTMLDivElement>(null);
+    const noteRef = useRef<HTMLElement>(null);
 
     const startInteraction = (e: React.PointerEvent<HTMLDivElement>, kind: Interaction["type"]) => {
         // Primary button / touch / pen only
@@ -102,8 +102,9 @@ export const StickyNote = ({ note, onUpdate, onBringToFront, onDragEnd, getDragB
     };
 
     return (
-        <div
+        <article
             ref={noteRef}
+            aria-label="Sticky note"
             className="sticky-note brute-card"
             style={{
                 left: note.x,
@@ -118,6 +119,7 @@ export const StickyNote = ({ note, onUpdate, onBringToFront, onDragEnd, getDragB
             onPointerDown={onBringToFront}
         >
             <div
+                aria-label="Move note"
                 className="note-handle"
                 onPointerDown={(e) => startInteraction(e, "drag")}
             >
@@ -125,6 +127,7 @@ export const StickyNote = ({ note, onUpdate, onBringToFront, onDragEnd, getDragB
             </div>
 
             <textarea
+                aria-label="Note text"
                 placeholder="Type here..."
                 value={note.text}
                 onChange={(e) => handleTextChange(e.target.value)}
@@ -139,9 +142,10 @@ export const StickyNote = ({ note, onUpdate, onBringToFront, onDragEnd, getDragB
 
             {/* Resize corner */}
             <div
+                aria-label="Resize note"
                 className="resize-handle"
                 onPointerDown={(e) => startInteraction(e, "resize")}
             />
-        </div>
+        </article>
     );
 };

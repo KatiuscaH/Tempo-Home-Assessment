@@ -6,7 +6,7 @@ Sticky Notes app — React 19 + TypeScript + Vite home assessment. See [README.m
 - `npm run dev` — start dev server (http://localhost:5173)
 - `npm run build` — type-check (`tsc -b`) and build
 - `npm run lint` — ESLint
-- No test runner is installed yet. When tests are needed, propose Vitest + React Testing Library + jsdom first.
+- `npm test` — Vitest + React Testing Library (jsdom); `npm run test:watch` for watch mode
 
 ## Project structure
 ```
