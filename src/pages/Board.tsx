@@ -1,7 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { StickyNote } from "../components/StickyNote"
-import type { Note } from "../types/Note.type";
-import { STICKY_NOTE_COLORS } from "../consts/StickyNoteColors";
 import { useNotes } from "../hooks/useNotes.hook";
 
 export const Board = () => {
